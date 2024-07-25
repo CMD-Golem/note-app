@@ -1,2 +1,2 @@
 # note-app
-My personal note, calculator, wallet app
+My personal note, calculator, wallet, file sharing app.
