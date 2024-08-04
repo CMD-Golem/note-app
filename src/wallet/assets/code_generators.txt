@@ -1,0 +1,2 @@
+Barcodes: https://www.barcodesvg.com
+QR-Codes: https://barcode.tec-it.com/
