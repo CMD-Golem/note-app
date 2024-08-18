@@ -1,0 +1,131 @@
+@font-face {
+	font-family: roboto;
+	src: url(roboto.ttf);
+	font-weight: normal;
+}
+
+body {
+	background-color: black;
+	margin: 0;
+	font-family: roboto;
+}
+
+main {
+	margin-bottom: 105px;
+}
+
+footer {
+	display: grid;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	height: 95px;
+}
+
+footer button {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	width: 66px;
+	height: 95px;
+	background-color: transparent;
+	border: none;
+	color: #FFFEFF;
+	padding: 0;
+	padding-top: 20px;
+}
+
+footer button svg {
+	width: 26px;
+	height: 26px;
+	fill: #FFFEFF;
+}
+
+footer button p {
+	visibility: hidden;
+	font-size: 14px;
+	margin: 0;
+	margin-bottom: 6.1px;
+}
+
+footer button.active svg {
+	fill: #212022;
+}
+
+footer button.active p,  footer button:hover p {
+	visibility: visible;
+}
+
+footer .background, footer .buttons {
+	display: flex;
+	justify-content: center;
+	grid-column: 1;
+	grid-row: 1;
+}
+
+footer .background div {
+	display: block;
+	flex-grow: 0;
+	background-color: #212022;
+}
+
+footer .background svg {
+	display: none;
+	width: 132px;
+	height: 95px;
+}
+
+#footer_left, #footer_right, #footer_center {
+	cy: var(--radius-vertical);
+	ry: var(--radius-vertical);
+	animation: var(--footer-animation);
+}
+
+#footer_left {
+	cx: calc(66px - var(--radius-vertical) - var(--radius-horizontal));
+	rx: var(--radius-vertical);
+}
+#footer_right {
+	cx: calc(66px + var(--radius-vertical) + var(--radius-horizontal));
+	rx: var(--radius-vertical);
+}
+#footer_center {
+	cx: 66px;
+	rx: var(--radius-horizontal);
+}
+
+#footer_top {
+	width: calc((var(--radius-vertical) + var(--radius-horizontal))*2);
+	height: var(--radius-vertical);
+	x: calc(66px - var(--radius-vertical) - var(--radius-horizontal));
+	y: 0;
+	animation: var(--footer-animation);
+}
+
+@property --radius-vertical {
+	syntax: '<length>';
+	initial-value: 33px;
+	inherits: false;
+}
+
+  @property --radius-horizontal {
+	syntax: '<length>';
+	initial-value: 33px;
+	inherits: false;
+}
+
+@keyframes footer {
+	0% {
+		--radius-vertical: 0;
+		--radius-horizontal: 0;
+	}
+	50% {
+		--radius-vertical: 10px;
+		--radius-horizontal: 20px;
+	}
+	100% {
+		--radius-vertical: 33px;
+		--radius-horizontal: 33px;
+	}
+}
