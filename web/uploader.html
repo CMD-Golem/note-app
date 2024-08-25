@@ -1,0 +1,38 @@
+<input type="file" id="imageInput" accept="image/*">
+
+<script>
+async function uploadBlob(store, path, type) {
+	const input = document.getElementById('imageInput');
+	const file = input.files[0];
+	if (!file) {
+		alert('Please select an image first.');
+		return;
+	}
+
+	const reader = new FileReader();
+	reader.onload = async function(e) {
+		const imageData = e.target.result;
+		const response = await fetch("/.netlify/functions/blob_handler", {
+			method: "POST",
+			body: JSON.stringify({
+				store: store,
+				path: path,
+				type: type,
+				data: imageData
+			})
+		});
+		var result = await response.json();
+	};
+	reader.readAsDataURL(file);
+}
+
+async function deleteBlob(store, path) {
+	const response = await fetch("/.netlify/functions/blob_handler", {
+		method: "DELETE",
+		body: JSON.stringify({
+			store: store,
+			path: path
+		})
+	});
+}
+</script>
