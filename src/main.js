@@ -35,7 +35,7 @@ footer_spacer.nextElementSibling.addEventListener("animationend", function() {
 var url_parameter = new URLSearchParams(window.location.search);
 var selected_app = url_parameter.get("app");
 
-if (selected_app == null || selected_app == "") document.getElementById("notes").click();
+if (selected_app == null || selected_app == "") document.getElementById("files").click();
 else document.getElementById(selected_app).click();
 
 footer_spacer.nextElementSibling.style.display = "block";
