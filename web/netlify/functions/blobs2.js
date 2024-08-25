@@ -1,4 +1,4 @@
-var getStore = require("@netlify/blobs");
+import { getStore } from "@netlify/blobs";
 
 exports.handler = async (event, context) => {
 	var user_data = JSON.parse(event.body);
