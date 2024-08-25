@@ -1,9 +1,10 @@
-import { getStore } from "@netlify/blobs";
+import { connectLambda, getStore } from "@netlify/blobs";
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
+	connectLambda(event)
+
 	var user_data = JSON.parse(event.body);
 	console.log(user_data)
-	console.log(context)
 
 	await getStore("notes").set("max", "For general carpentry");
 	await getStore("keep").set("max", "For general carpentry");
