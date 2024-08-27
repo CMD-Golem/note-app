@@ -2,16 +2,15 @@ import { connectLambda, getStore } from "@netlify/blobs";
 
 exports.handler = async (event) => {
 	connectLambda(event)
-	console.log(event)
 
 	if (event.httpMethod == "GET") {
 		var {store, path, type} = JSON.parse(event.body);
 		var response = await getStore(store).get(path, {type:type});
 	}
-	else if (event.httpMethod !== "POST") {
+	else if (event.httpMethod == "POST") {
 		var {store, path, type, data} = JSON.parse(event.body);
 		if (type == "base64") {
-			var base64 = data.replace(/^data:image\/\w+;base64,/, "");
+			var base64 = data.replace(/^data:.*?;base64,/, "");
 			console.log(base64)
 			var buffer = Buffer.from(base64, "base64");
 
@@ -19,7 +18,7 @@ exports.handler = async (event) => {
 		}
 		else var response = await getStore(store).set(path, data);
 	}
-	else if (event.httpMethod !== "DELETE") {
+	else if (event.httpMethod == "DELETE") {
 		var {store, path} = JSON.parse(event.body);
 		var response = await getStore(store).get(path);
 	}
