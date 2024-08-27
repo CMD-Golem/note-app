@@ -8,19 +8,12 @@ exports.handler = async (event) => {
 		var response = await getStore(store).get(path, {type:type});
 	}
 	else if (event.httpMethod == "POST") {
-		var {store, path, type, data} = JSON.parse(event.body);
-		if (type == "base64") {
-			var base64 = data.replace(/^data:.*?;base64,/, "");
-			console.log(base64)
-			var buffer = Buffer.from(base64, "base64");
-
-			var response = await getStore(store).set(path, buffer);
-		}
-		else var response = await getStore(store).set(path, data);
+		var {store, path, data} = JSON.parse(event.body);
+		var response = await getStore(store).set(path, data);
 	}
 	else if (event.httpMethod == "DELETE") {
 		var {store, path} = JSON.parse(event.body);
-		var response = await getStore(store).get(path);
+		var response = await getStore(store).delete(path);
 	}
 	else {
 		var response = {statusCode:405, body:"Method Not Allowed"};
