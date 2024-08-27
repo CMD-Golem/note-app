@@ -1,7 +1,7 @@
 <input type="file" id="imageInput" accept="image/*">
 
 <script>
-async function uploadBlob(store, path, type) {
+async function uploadBlob(store, path) {
 	var input = document.getElementById('imageInput');
 	var file = input.files[0];
 	if (!file) {
@@ -11,7 +11,8 @@ async function uploadBlob(store, path, type) {
 
 	var reader = new FileReader();
 	reader.onload = async function(e) {
-		var image_data = await fetch(e.target.result).then(r => r.blob());
+		var image_data = Uint8Array.from(atob(e.target.result), c => c.charCodeAt(0)); // ArrayBuffer
+		// var image_data = await fetch(e.target.result).then(r => r.blob()); // Blob
 
 		var response = await fetch("/.netlify/functions/blob_handler", {
 			method: "PUT",
@@ -35,5 +36,22 @@ async function deleteBlob(store, path) {
 			path: path
 		})
 	});
+}
+
+async function getBlob(store, path, type) {
+	var response = await fetch("/.netlify/functions/blob_handler", {
+		method: "POST",
+		body: JSON.stringify({
+			store: store,
+			path: path,
+			type: type
+		})
+	});
+
+	// doesnt work (also with blob)
+	var image_data = await response.arrayBuffer();
+    var blob = new Blob( [ image_data ], { type: "image/jpeg" } );
+    var urlCreator = window.URL || window.webkitURL;
+    var imageUrl = urlCreator.createObjectURL( blob );
 }
 </script>
