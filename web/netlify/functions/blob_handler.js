@@ -11,6 +11,7 @@ exports.handler = async (event) => {
 		var {store, path, type, data} = JSON.parse(event.body);
 		if (type == "base64") {
 			var base64 = data.replace(/^data:image\/\w+;base64,/, "");
+			console.log(base64)
 			var buffer = Buffer.from(base64, "base64");
 
 			var response = await getStore(store).set(path, buffer);
