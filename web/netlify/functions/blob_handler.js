@@ -2,6 +2,7 @@ import { connectLambda, getStore } from "@netlify/blobs";
 
 exports.handler = async (event) => {
 	connectLambda(event)
+	console.log(event)
 
 	if (event.httpMethod == "GET") {
 		var {store, path, type} = JSON.parse(event.body);
