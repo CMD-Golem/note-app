@@ -14,7 +14,7 @@ async function uploadBlob(store, path, type) {
 		var image_data = await fetch(e.target.result).then(r => r.blob());
 
 		var response = await fetch("/.netlify/functions/blob_handler", {
-			method: "POST",
+			method: "PUT",
 			body: JSON.stringify({
 				store: store,
 				path: path,
