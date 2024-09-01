@@ -9,28 +9,29 @@ async function uploadBlob(store, path) {
 		return;
 	}
 
+	console.log(file.type)
+
 	var reader = new FileReader();
 	reader.onload = async function(e) {
-		var image_data = Uint8Array.from(atob(e.target.result), c => c.charCodeAt(0)); // ArrayBuffer
-		// var image_data = await fetch(e.target.result).then(r => r.blob()); // Blob
-
 		var response = await fetch("/.netlify/functions/blob_handler", {
 			method: "PUT",
+			headers: {"Content-Type": "application/json",},
 			body: JSON.stringify({
 				store: store,
 				path: path,
-				data: image_data
+				data: Array.from(new Uint8Array(e.target.result))
 			})
 		});
 		var result = await response.json();
 		console.log(result);
 	};
-	reader.readAsDataURL(file);
+	reader.readAsArrayBuffer(file);
 }
 
 async function deleteBlob(store, path) {
 	var response = await fetch("/.netlify/functions/blob_handler", {
 		method: "DELETE",
+		headers: {"Content-Type": "application/json",},
 		body: JSON.stringify({
 			store: store,
 			path: path
@@ -38,20 +39,22 @@ async function deleteBlob(store, path) {
 	});
 }
 
-async function getBlob(store, path, type) {
+async function getBlob(store, path) {
 	var response = await fetch("/.netlify/functions/blob_handler", {
 		method: "POST",
+		headers: {"Content-Type": "application/json",},
 		body: JSON.stringify({
 			store: store,
-			path: path,
-			type: type
+			path: path
 		})
 	});
 
-	// doesnt work (also with blob)
-	var image_data = await response.arrayBuffer();
-    var blob = new Blob( [ image_data ], { type: "image/jpeg" } );
-    var urlCreator = window.URL || window.webkitURL;
-    var imageUrl = urlCreator.createObjectURL( blob );
+	var array_buffer = await response.arrayBuffer();
+	var binary = "";
+    var bytes = new Uint8Array(array_buffer);
+    
+    for (var i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    
+	console.log(btoa(binary)); 
 }
 </script>
