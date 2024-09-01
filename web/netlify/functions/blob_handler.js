@@ -7,8 +7,7 @@ exports.handler = async (event) => {
 	if (event.httpMethod == "POST") {
 		var {store, path} = JSON.parse(event.body);
 		var data = await getStore(store).get(path, {type:"arrayBuffer"});
-		var array_buffer = await data.arrayBuffer();
-		var data_array = Array.from(new Uint8Array(array_buffer))
+		var data_array = Array.from(new Uint8Array(data));
 
 		return {
 			statusCode: 200,
