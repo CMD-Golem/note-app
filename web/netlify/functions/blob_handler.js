@@ -8,10 +8,12 @@ exports.handler = async (event) => {
 		var {store, path} = JSON.parse(event.body);
 		var data = await getStore(store).get(path, {type:"arrayBuffer"});
 		var array_buffer = await data.arrayBuffer();
+		var data_array = Array.from(new Uint8Array(array_buffer))
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify(Array.from(new Uint8Array(array_buffer)))
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({ data:data_array })
 		}
 	}
 	// upload data
@@ -24,7 +26,8 @@ exports.handler = async (event) => {
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify(response)
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({ data:response })
 		}
 	}
 	// delete data
@@ -34,7 +37,8 @@ exports.handler = async (event) => {
 
 		return {
 			statusCode: 200,
-			body: JSON.stringify(response)
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({ data:response })
 		}
 	}
 	else {
