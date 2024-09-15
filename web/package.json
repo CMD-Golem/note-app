@@ -7,7 +7,7 @@
 		"bcryptjs": "^2.4.3"
 	},
 	"scripts": {
-		"prebuild": "cp -r ../src ./src",
+		"prebuild": "cp -r ./src ./web/src",
 		"build": "npm run build"
 	}
 }
