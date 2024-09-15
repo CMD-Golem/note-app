@@ -25,7 +25,7 @@ export default class Wallet {
 
 			element.innerHTML = `
 				<div class="card-face front">
-					<img src="./wallet/assets/cards/${card.image}.svg">
+					<img src="./wallet/assets/${card.image}.svg">
 					<span>${subtitle}</span>
 				</div>
 				<div class="card-face back">

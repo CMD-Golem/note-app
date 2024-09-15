@@ -5,5 +5,9 @@
 	"dependencies": {
 		"@netlify/blobs": "^8.0.0",
 		"bcryptjs": "^2.4.3"
+	},
+	"scripts": {
+		"prebuild": "cp -r ../src ./src",
+		"build": "npm run build"
 	}
-  }
+}

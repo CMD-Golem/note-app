@@ -11,62 +11,36 @@ import bcrypt from "bcryptjs";
 // site:files
 
 exports.handler = async (event) => {
-	connectLambda(event)
+	connectLambda(event);
+
+	var {user, password} = JSON.parse(event.body);
+	var data = await getStore(user).get("user.json", {type:"json"});
+	console.log(data);
 
 	// check login attempt
 	if (event.httpMethod == "POST") {
-		var {user, password_secret, device_id} = JSON.parse(event.body);
-
-		// get user data
-		var json = await getStore(user).setJSON("user.json");
-		if (json == null) return {
+		// check if user exists
+		if (data == null) return {
 			statusCode: 404,
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify({ data:"This user doesn't exitsts" })
+			body: "This user doesn't exitsts"
 		}
 
-		var data = JSON.parse(json);
-
-		// relogin with device id
-		if (device_id != undefined) {
-			var index = data.devices.findIndex(obj => obj.id == device_id && obj.secret == password_secret);
-			if (index >= 0) {
-				var new_secret = crypto.randomBytes(32);
-				data.devices[index].secret = new_secret;
-
-				var response = await getStore(user).setJSON("user.json", JSON.stringify(data));
-				console.log(response)
-				return  {
-					statusCode: 200,
-					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({
-						secret: new_secret
-					})
-				}
-			}
-			// return error when device id doesnt match secret
-			else {
-				return {
-					statusCode: 406,
-					headers: {"Content-Type": "application/json"},
-					body: JSON.stringify({ data:"Stored authentication mismatched, new login now required" })
-				}
-			}
-		}
-		// run new login
-		else if (device_id == undefined && bcrypt.compare(password_secret, data.password_hash)) {
-			var new_device = crypto.randomBytes(32)
+		// check password and send new device_id, secret
+		if (bcrypt.compare(password, data.password_hash)) {
+			var new_device = crypto.randomBytes(32);
 			var secret = crypto.randomBytes(32);
 			data.devices.push({ id:new_device, secret:secret });
+			console.log(data)
 
 			var response = await getStore(user).setJSON("user.json", JSON.stringify(data));
-			console.log(response)
 			return  {
 				statusCode: 200,
 				headers: {"Content-Type": "application/json"},
 				body: JSON.stringify({
+					response: response,
 					id: device_id,
-					secret: secret
+					secret: secret,
+					salt: data.salt
 				})
 			}
 		}
@@ -74,41 +48,42 @@ exports.handler = async (event) => {
 		else {
 			return {
 				statusCode: 406,
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({ data:"User or Password is wrong" })
+				body: "User or Password is wrong"
 			}
 		}
 	}
 	// new user
 	else if (event.httpMethod == "PUT") {
-		var {user, password} = JSON.parse(event.body);
-
-		// check for existing user
-		var user = await getStore(user).get("user.json");
-		if (user == null) return {
+		// check if username is already taken
+		if (data != null) return {
 			statusCode: 409,
-			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify({ data:"This user already exitsts" })
+			body: "This user already exitsts"
 		}
 
 		// create new user
-		var device_id = crypto.randomBytes(32)
+		var device_id = crypto.randomBytes(32);
 		var secret = crypto.randomBytes(32);
+		var salt = crypto.randomBytes(32).toString("hex");
 		var hash = await bcrypt.hash(password, 10);
+		var key = await crypto.subtle.generateKey( {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"] );
+		var time = new Date().toISOString();
 
 		var response = await getStore(user).setJSON("user.json", JSON.stringify({
 			user_name: user,
 			password_hash: hash,
-			devices: [{ id:device_id, secret:secret }]
+			encryption_key: key,
+			salt: salt,
+			devices: [{ id:device_id, secret:secret, timestamp:time }]
 		}));
-		console.log(response)
 
 		return  {
 			statusCode: 200,
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify({
+				response: response,
 				id: device_id,
-				secret: secret
+				secret: secret,
+				salt: salt
 			})
 		}
 	}

@@ -18,7 +18,7 @@ footer {
 	display: grid;
 	position: fixed;
 	bottom: 0;
-	width: 100%;
+	width: 100vw;
 	height: 95px;
 }
 
@@ -62,6 +62,7 @@ footer .background, footer .buttons {
 	justify-content: center;
 	grid-column: 1;
 	grid-row: 1;
+	width: 100vw;
 }
 
 footer .background div {
