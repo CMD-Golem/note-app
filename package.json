@@ -7,6 +7,6 @@
 		"bcryptjs": "^2.4.3"
 	},
 	"scripts": {
-		"build": "cp -r src web/src"
+		"build": "cp -r src web"
 	}
 }

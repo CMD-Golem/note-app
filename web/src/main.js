@@ -21,9 +21,9 @@ for (var i = 0; i < footer_buttons.length; i++) {
 			// update url
 			window.history.replaceState({}, '', `${window.location.pathname}?app=${e.currentTarget.id}`);
 
-			// load data
-			document.getElementById("head_style").innerHTML = `@import url("${e.currentTarget.id}/style.css")`;
-			import(`./${e.currentTarget.id}/frontend.js`).then((Module) => {
+			// load data 
+			document.getElementById("head_style").innerHTML = `@import url("/src/${e.currentTarget.id}/style.css")`;
+			import(`/src/${e.currentTarget.id}/frontend.js`).then((Module) => {
 				var Application = Module.default;
 				Application.load();
 			});
