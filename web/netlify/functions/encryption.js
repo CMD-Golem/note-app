@@ -21,7 +21,7 @@ exports.handler = async (event) => {
 	if (index == -1) {
 		user_data.devices = [];
 		user_data.info = "Your cookies"
-		var response = await getStore(user).setJSON("user.json", JSON.stringify(user_data));
+		var response = await getStore(user).setJSON("user.json", user_data);
 		console.log(response);
 
 		return {
@@ -34,7 +34,7 @@ exports.handler = async (event) => {
 	// 	var new_secret = crypto.randomBytes(32);
 	// 	user_data.devices[index].secret = new_secret;
 
-	// 	var response = await getStore(user).setJSON("user.json", JSON.stringify(user_data));
+	// 	var response = await getStore(user).setJSON("user.json", user_data);
 
 	// 	response_data.secret = new_secret;
 	// }

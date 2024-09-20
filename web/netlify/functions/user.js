@@ -27,13 +27,15 @@ exports.handler = async (event) => {
 		}
 
 		// check password and send new device_id, secret
-		if (bcrypt.compare(password, data.password_hash)) {
+		var correct_password = await bcrypt.compare(password, data.password_hash)
+		if (correct_password) {
 			var new_device = crypto.randomBytes(32);
 			var secret = crypto.randomBytes(32);
-			data.devices.push({ id:new_device, secret:secret });
+			var time = new Date().toISOString();
+			data.devices.push({ id:new_device, secret:secret, timestamp:time });
 			console.log(data)
 
-			var response = await getStore(user).setJSON("user.json", JSON.stringify(data));
+			var response = await getStore(user).setJSON("user.json", data);
 			return  {
 				statusCode: 200,
 				headers: {"Content-Type": "application/json"},
@@ -70,13 +72,13 @@ exports.handler = async (event) => {
 		var exported_key = await crypto.webcrypto.subtle.exportKey('jwk', key);
 		var time = new Date().toISOString();
 
-		var response = await getStore(user).setJSON("user.json", JSON.stringify({
+		var response = await getStore(user).setJSON("user.json", {
 			user_name: user,
 			password_hash: hash,
 			encryption_key: exported_key,
 			salt: salt,
 			devices: [{ id:device_id, secret:secret, timestamp:time }]
-		}));
+		});
 
 		return  {
 			statusCode: 200,
