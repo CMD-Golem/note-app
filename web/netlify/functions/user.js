@@ -1,5 +1,6 @@
 import { connectLambda, getStore } from "@netlify/blobs";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // site:fabian
 // 	wallet/
