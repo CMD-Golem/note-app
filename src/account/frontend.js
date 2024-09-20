@@ -48,7 +48,7 @@ export default class Account {
 
 		user_data.iv = await Account.generateIv(password, user, user_data.salt, null);
 		user_data.user = user;
-		user_data.salt = undefined;
+		delete user_data.salt;
 	
 		localStorage.setItem("user", JSON.stringify(user_data));
 		console.log(user_data);

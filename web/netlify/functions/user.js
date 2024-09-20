@@ -67,12 +67,13 @@ exports.handler = async (event) => {
 		var salt = crypto.randomBytes(32).toString("hex");
 		var hash = await bcrypt.hash(password, 10);
 		var key = await crypto.webcrypto.subtle.generateKey( {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"] );
+		var exported_key = await crypto.webcrypto.subtle.exportKey('jwk', key);
 		var time = new Date().toISOString();
 
 		var response = await getStore(user).setJSON("user.json", JSON.stringify({
 			user_name: user,
 			password_hash: hash,
-			encryption_key: key,
+			encryption_key: exported_key,
 			salt: salt,
 			devices: [{ id:device_id, secret:secret, timestamp:time }]
 		}));
