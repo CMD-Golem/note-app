@@ -3,7 +3,7 @@ var footer_buttons = document.getElementsByClassName("footer_button");
 
 // load page und change footer
 for (var i = 0; i < footer_buttons.length; i++) {
-	footer_buttons[i].addEventListener("click", function(e) {
+	footer_buttons[i].addEventListener("click", async function(e) {
 		if (!e.currentTarget.classList.contains("active")) {
 			document.querySelector("main").innerHTML = "";
 
@@ -23,10 +23,10 @@ for (var i = 0; i < footer_buttons.length; i++) {
 
 			// load data 
 			document.getElementById("head_style").innerHTML = `@import url("/src/${e.currentTarget.id}/style.css")`;
-			import(`/src/${e.currentTarget.id}/frontend.js`).then((Module) => {
-				var Application = Module.default;
-				Application.load();
-			});
+
+			const Module = await import(`/src/${e.currentTarget.id}/frontend.js`);
+			window.app = Module.Public;
+			Module.default.load();
 		}
 	});
 }

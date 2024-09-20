@@ -1,0 +1,88 @@
+<input type="file" id="imageInput" accept="image/*">
+
+<p>data:image/svg+xml;base64,xxxxx==</p>
+
+<img>
+
+<script>
+async function uploadBlob(path, encrypted) {
+	var input = document.getElementById('imageInput');
+	var file = input.files[0];
+	if (!file) {
+		alert('Please select an image first.');
+		return;
+	}
+
+	var user_data = JSON.parse(localStorage.getItem("user"));
+	if (user_data == null) return Error("No Account loged in");
+
+	console.log(file.type)
+
+	var reader = new FileReader();
+	reader.onload = async function(e) {
+		var response = await fetch("/.netlify/functions/blob_handler", {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				user: user_data.user,
+				secret: user_data.secret,
+				device_id: user_data.id,
+				request_data: {
+					iv: user_data.iv,
+					path: path,
+					encrypted: encrypted,
+					array: Array.from(new Uint8Array(e.target.result))
+				}
+			})
+		});
+		var result = await response.json();
+		console.log(result);
+	};
+	reader.readAsArrayBuffer(file);
+}
+
+async function getBlob(store, path) {
+	var user_data = JSON.parse(localStorage.getItem("user"));
+	if (user_data == null) return Error("No Account loged in");
+
+	var response = await fetch("/.netlify/functions/blob_handler", {
+		method: "POST",
+		headers: {"Content-Type": "application/json"},
+		body: JSON.stringify({
+			user: user_data.user,
+			secret: user_data.secret,
+			device_id: user_data.id,
+			request_data: {
+				iv: user_data.iv,
+				path: path,
+				encrypted: encrypted
+			}
+		})
+	});
+
+	var response = await response.json();
+	var data_array = new Uint8Array(response.data);
+	var binary_string = String.fromCharCode.apply(null, data_array);
+
+	document.querySelector("img").src = "data:image/svg+xml;base64," + btoa(binary_string);
+}
+
+async function deleteBlob(path) {
+	var user_data = JSON.parse(localStorage.getItem("user"));
+	if (user_data == null) return Error("No Account loged in");
+
+	var response = await fetch("/.netlify/functions/blob_handler", {
+		method: "DELETE",
+		headers: {"Content-Type": "application/json"},
+		body: JSON.stringify({
+			user: user_data.user,
+			secret: user_data.secret,
+			device_id: user_data.id,
+			request_data: {
+				path: path
+			}
+		})
+	});
+}
+</script>
+
