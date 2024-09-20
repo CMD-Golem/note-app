@@ -47,7 +47,7 @@ export default class Account {
 		var user_data = await response.json();
 
 		user_data.user = user;
-		user_data.iv = generateIv(password, user, salt, null);
+		user_data.iv = await Account.generateIv(password, user, salt, null);
 	
 		localStorage.setItem("user", JSON.stringify(user_data));
 		console.log(user_data);
@@ -90,6 +90,6 @@ export default class Account {
 
 export class Public {
 	static async button_click(register) {
-		login(register)
+		Account.login(register);
 	}
 }
