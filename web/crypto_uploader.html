@@ -41,7 +41,7 @@ async function uploadBlob(path, encrypted) {
 	reader.readAsArrayBuffer(file);
 }
 
-async function getBlob(store, path) {
+async function getBlob(path, encrypted) {
 	var user_data = JSON.parse(localStorage.getItem("user"));
 	if (user_data == null) return Error("No Account loged in");
 
