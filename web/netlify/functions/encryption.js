@@ -31,7 +31,7 @@ exports.handler = async (event) => {
 	}
 	// create new secret if it is time
 	// else if (user_data.timestamp) {
-	// 	var new_secret = crypto.randomBytes(32);
+	// 	var new_secret = crypto.randomBytes(32).toString("hex");
 	// 	user_data.devices[index].secret = new_secret;
 
 	// 	var response = await getStore(user).setJSON("user.json", user_data);

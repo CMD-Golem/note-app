@@ -29,8 +29,8 @@ exports.handler = async (event) => {
 		// check password and send new device_id, secret
 		var correct_password = await bcrypt.compare(password, data.password_hash)
 		if (correct_password) {
-			var new_device = crypto.randomBytes(32);
-			var secret = crypto.randomBytes(32);
+			var new_device = crypto.randomBytes(32).toString("hex");
+			var secret = crypto.randomBytes(32).toString("hex");
 			var time = new Date().toISOString();
 			data.devices.push({ id:new_device, secret:secret, timestamp:time });
 			console.log(data)
@@ -64,8 +64,8 @@ exports.handler = async (event) => {
 		}
 
 		// create new user
-		var device_id = crypto.randomBytes(32);
-		var secret = crypto.randomBytes(32);
+		var device_id = crypto.randomBytes(32).toString("hex");
+		var secret = crypto.randomBytes(32).toString("hex");
 		var salt = crypto.randomBytes(32).toString("hex");
 		var hash = await bcrypt.hash(password, 10);
 		var key = await crypto.webcrypto.subtle.generateKey( {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"] );
