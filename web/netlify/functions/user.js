@@ -41,7 +41,7 @@ exports.handler = async (event) => {
 				headers: {"Content-Type": "application/json"},
 				body: JSON.stringify({
 					response: response,
-					id: device_id,
+					id: new_device,
 					secret: secret,
 					salt: data.salt
 				})

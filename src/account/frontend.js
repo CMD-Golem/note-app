@@ -5,8 +5,8 @@ export default class Account {
 		var register_button = document.createElement("button");
 		var login_button = document.createElement("button");
 
-		register_button.addEventListener("click", app.button_click.bind(null, true));
-		login_button.addEventListener("click", app.button_click.bind(null, false));
+		register_button.addEventListener("click", app.buttonClick.bind(null, true));
+		login_button.addEventListener("click", app.buttonClick.bind(null, false));
 		register_button.innerHTML = "Create Data";
 		login_button.innerHTML = "Login";
 
@@ -46,7 +46,7 @@ export default class Account {
 	
 		var user_data = await response.json();
 
-		user_data.iv = await Account.generateIv(password, user, user_data.salt, null);
+		user_data.iv = await Account.generateIv(password, user, user_data.salt, 32);
 		user_data.user = user;
 		delete user_data.salt;
 	
@@ -59,7 +59,7 @@ export default class Account {
 		var password = document.getElementById("login_password").value;
 		var identifier = document.getElementById("login_identifier").value;
 
-		var iv = generateIv(password, user, identifier);
+		var iv = generateIv(password, user, identifier, length);
 	}
 
 	static async generateIv(masterKey, domain, masterString, string) {
@@ -72,25 +72,22 @@ export default class Account {
 			["sign"]
 		);
 	
+		var iv_string = "";
+		var charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()_+-=[]{}|/;:,.<>";
 		var signature = await crypto.subtle.sign("HMAC", crypto_key, encoder.encode(domain + masterString));
 		var iv_array = Array.from(new Uint8Array(signature));
-	
-		if (string == null) return iv_array;
-		else {
-			var iv_string = "";
-			var charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()_+-=[]{}|/;:,.<>";
-			
-			for (let i = 0; i < iv_array.length; i++) {
-				iv_string += charset[iv_array[i] % charset.length];
-			}
-	
-			return iv_string.slice(0, string);
+		
+		for (let i = 0; i < iv_array.length; i++) {
+			iv_string += charset[iv_array[i] % charset.length];
 		}
+
+		return iv_string.slice(0, string);
 	}
 }
 
 export class Public {
-	static async button_click(register) {
+	static async buttonClick(register) {
+		// check if device already
 		Account.login(register);
 	}
 }

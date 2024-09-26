@@ -44,8 +44,8 @@ exports.handler = async (event) => {
 	if (event.httpMethod == "POST") {
 		var buffer = await getStore(user).get(request_data.path, {type:"arrayBuffer"});
 		if (request_data.encrypted) {
-			var encryption_key = await crypto.webcrypto.subtle.importKey("jwk", user_data.encryption_key, {name: 'AES-GCM'}, true, ['encrypt', 'decrypt']);
-			var decrypted_buffer = await crypto.webcrypto.subtle.decrypt( {name: "AES-GCM", iv: request_data.iv}, encryption_key, buffer );
+			var [encryption_key, iv_key] = handleCrypto(user_data.encryption_key, request_data.iv);
+			var decrypted_buffer = await crypto.webcrypto.subtle.decrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
 		}
 		else var decrypted_buffer = buffer;
 
@@ -56,8 +56,8 @@ exports.handler = async (event) => {
 	else if (event.httpMethod == "PUT") {
 		var buffer = new Uint8Array(request_data.array).buffer;
 		if (request_data.encrypted) {
-			var encryption_key = await crypto.webcrypto.subtle.importKey("jwk", user_data.encryption_key, {name: 'AES-GCM'}, true, ['encrypt', 'decrypt']);
-			var encrypted_buffer = await crypto.webcrypto.subtle.encrypt( {name: "AES-GCM", iv: request_data.iv}, encryption_key, buffer );
+			var [encryption_key, iv_key] = handleCrypto(user_data.encryption_key, request_data.iv);
+			var encrypted_buffer = await crypto.webcrypto.subtle.encrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
 		}
 		else var encrypted_buffer = buffer;
 
@@ -84,3 +84,15 @@ exports.handler = async (event) => {
 		body: JSON.stringify(response_data)
 	}
 };
+
+async function handleCrypto(user_key, iv) {
+	// get encryption_key
+	var encryption_key = await crypto.webcrypto.subtle.importKey("jwk", user_key, {name: 'AES-GCM'}, true, ['encrypt', 'decrypt']);
+
+	// get iv from string
+	var encoder = new TextEncoder();
+	var hash_buffer = await crypto.subtle.digest("SHA-256", encoder.encode(iv));
+	var iv_key = new Uint8Array(hash_buffer).slice(0, 12);
+
+	return [encryption_key, iv_key];
+}
