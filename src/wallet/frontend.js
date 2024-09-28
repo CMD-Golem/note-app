@@ -13,12 +13,43 @@ const wallet_data = [
 ]
 
 export default class Wallet {
-	static load() {
+	static async load() {
 		var main = document.querySelector("main");
+
+		// TODO: Create an array of paths and load them all at once.
+
+		// load images
+		var user_data = JSON.parse(localStorage.getItem("user"));
+		if (user_data == null) return Error("No Account loged in");
+
+		var response = await fetch("/.netlify/functions/encryption", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				user: user_data.user,
+				secret: user_data.secret,
+				device_id: user_data.id,
+				request_data: {
+					iv: user_data.iv,
+					path: `wallet/${card.image}_${card.barcode}.svg`,
+					encrypted: true
+				}
+			})
+		});
+
+			
 
 		for (var i = 0; i < wallet_data.length; i++) {
 			var card = wallet_data[i];
 
+			// load images
+			
+
+			var result = await response.json();
+			var data_array = new Uint8Array(result.array);
+			var binary_string = String.fromCharCode.apply(null, data_array);
+
+			// create html
 			var element = document.createElement('div');
 			if (card.path == "fam") var subtitle = "Familie";
 			else var subtitle = "";
@@ -30,7 +61,7 @@ export default class Wallet {
 				</div>
 				<div class="card-face back">
 					<span>${card.name} ${subtitle}</span>
-					<img src="./wallet/assets/${card.path}/${card.image}_${card.barcode}.svg">
+					<img src=${"data:image/svg+xml;base64," + btoa(binary_string)}>
 				</div>
 			`;
 
@@ -42,7 +73,6 @@ export default class Wallet {
 
 			main.appendChild(element);
 		}
-		
 
 		console.log("loaded Wallet");
 	}
