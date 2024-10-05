@@ -25,12 +25,12 @@ export default class Wallet {
 
 		var result = await response.json();
 		var decoder = new TextDecoder("utf-8");
-    	var json = decoder.decode(new Uint8Array(result.arrays[i]));
+    	var json = decoder.decode(new Uint8Array(result.arrays[0]));
 		var wallet_data = JSON.parse(json);
 
 		// get bar codes
 		var path_array = [];
-		for (var i = 0; i < wallet_data.length; i++) path_array.push(`wallet/${wallet_data[i].image}_${wallet_data[i].barcode}.svg.enc`);
+		for (var i = 0; i < wallet_data.length; i++) path_array.push(`wallet/${wallet_data[i].path}/${wallet_data[i].image}_${wallet_data[i].barcode}.svg.enc`);
 
 		var response = await fetch("/.netlify/functions/encryption", {
 			method: "POST",

@@ -1,4 +1,4 @@
-<input type="file" id="imageInput" accept="image/*">
+<input type="file" id="input" accept="/*">
 
 <p>data:image/svg+xml;base64,xxxxx==</p>
 
@@ -6,7 +6,7 @@
 
 <script>
 async function uploadBlob(path, encrypted) {
-	var input = document.getElementById('imageInput');
+	var input = document.getElementById('input');
 	var file = input.files[0];
 	if (!file) {
 		alert('Please select an image first.');
@@ -46,7 +46,7 @@ async function uploadBlob(path, encrypted) {
 	reader.readAsArrayBuffer(file);
 }
 
-async function getBlob(path, encrypted) {
+async function getBlob(path, encrypted, type) {
 	var user_data = JSON.parse(localStorage.getItem("user"));
 	if (user_data == null) return Error("No Account loged in");
 
@@ -70,10 +70,17 @@ async function getBlob(path, encrypted) {
 	var result = await response.json();
 	console.log(response);
 	console.log(result);
-	var data_array = new Uint8Array(result.arrays[0]);
-	var binary_string = String.fromCharCode.apply(null, data_array);
 
-	document.querySelector("img").src = "data:image/svg+xml;base64," + btoa(binary_string);
+	if (type == "image/svg") {
+		var data_array = new Uint8Array(result.arrays[0]);
+		var binary_string = String.fromCharCode.apply(null, data_array);
+
+		document.querySelector("img").src = "data:image/svg+xml;base64," + btoa(binary_string);
+	}
+	else if (type == "text/json") {
+		var decoder = new TextDecoder("utf-8");
+    	console.log(decoder.decode(new Uint8Array(result.arrays[0])));
+	}
 }
 
 async function deleteBlob(path) {
