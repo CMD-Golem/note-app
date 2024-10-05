@@ -71,13 +71,14 @@ async function getBlob(path, encrypted, type) {
 	console.log(response);
 	console.log(result);
 
-	if (type == "image/svg") {
+	// list with all types https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
+	if (type == "image/svg+xml") {
 		var data_array = new Uint8Array(result.arrays[0]);
 		var binary_string = String.fromCharCode.apply(null, data_array);
 
 		document.querySelector("img").src = "data:image/svg+xml;base64," + btoa(binary_string);
 	}
-	else if (type == "text/json") {
+	else if (type == "application/json") {
 		var decoder = new TextDecoder("utf-8");
     	console.log(decoder.decode(new Uint8Array(result.arrays[0])));
 	}

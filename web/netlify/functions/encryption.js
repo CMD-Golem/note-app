@@ -6,27 +6,42 @@ exports.handler = async (event) => {
 
 	// check user
 	var {user, secret, device_id, request_data} = JSON.parse(event.body);
-
-	// get user data
-	var user_data = await getStore(user).get("user.json", {type:"json"});
-	console.log(user_data);
-	if (user_data == null) return {
-		statusCode: 404,
-		body: "This user doesn't exitsts"
-	}
-
 	var response_data = {};
-	var index = user_data.devices.findIndex(obj => obj.id == device_id && obj.secret == secret);
-	// return error when device id doesnt match secret
-	if (index == -1) {
-		user_data.devices = [];
-		var response = await getStore(user).setJSON("user.json", user_data);
-		console.log(response);
 
-		return {
-			statusCode: 406,
-			body: "Stored authentication mismatched, new login now required"
+	if (user == "files") {
+		// request_data.iv = null; // gets sent along and is in qrcode
+		user_data.encryption_key = null; // defined somewhere for anyone
+		// request_data.encrypted = true;
+		// request_data.paths = null; // generate random number
+	}
+	else {
+		// get user data
+		var user_data = await getStore(user).get("user.json", {type:"json"});
+		if (user_data == null) return {
+			statusCode: 404,
+			body: "This user doesn't exitsts"
 		}
+
+		var index = user_data.devices.findIndex(obj => obj.id == device_id && obj.secret == secret);
+		// return error when device id doesnt match secret
+		if (index == -1) {
+			user_data.devices = [];
+			var response = await getStore(user).setJSON("user.json", user_data);
+
+			return {
+				statusCode: 406,
+				body: "Stored authentication mismatched, new login now required"
+			}
+		}
+		// create new secret if it is time
+		// else if (user_data.timestamp) {
+		// 	var new_secret = crypto.randomBytes(32).toString("hex");
+		// 	user_data.devices[index].secret = new_secret;
+
+		// 	var response = await getStore(user).setJSON("user.json", user_data);
+
+		// 	response_data.secret = new_secret;
+		// }
 	}
 
 	if (request_data.encrypted) {
@@ -38,17 +53,7 @@ exports.handler = async (event) => {
 		var hash_buffer = await crypto.subtle.digest("SHA-256", encoder.encode(request_data.iv));
 		var iv_key = new Uint8Array(hash_buffer).slice(0, 12);
 	}
-	// create new secret if it is time
-	// else if (user_data.timestamp) {
-	// 	var new_secret = crypto.randomBytes(32).toString("hex");
-	// 	user_data.devices[index].secret = new_secret;
-
-	// 	var response = await getStore(user).setJSON("user.json", user_data);
-
-	// 	response_data.secret = new_secret;
-	// }
 	
-
 	// decrypt and get data
 	if (event.httpMethod == "POST") {
 		response_data.arrays = [];

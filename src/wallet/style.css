@@ -1,6 +1,7 @@
 main {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: center;
 	padding: 10px;
 	gap: 10px;
 }
@@ -11,7 +12,7 @@ main .card {
 	height: calc((100vw - 20px)/1.5);
 	transition: transform 1s;
 	transform-style: preserve-3d;
-  	transform-origin: center;
+	transform-origin: center;
 }
 
 .card-face {
@@ -63,4 +64,11 @@ main .back img {
 	top: 43%;
 	left: 50%;
     transform: translate(-50%, -50%);
+}
+
+@media (min-width: 450px) {
+	main .card {
+		width: 420px;
+		height: 280px;
+	}
 }

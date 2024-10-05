@@ -2,8 +2,6 @@ export default class Wallet {
 	static async load() {
 		var main = document.querySelector("main");
 
-		// TODO: Create an array of paths and load them all at once.
-
 		// load data
 		var user_data = JSON.parse(localStorage.getItem("user"));
 		if (user_data == null) return Error("No Account loged in");
@@ -74,7 +72,7 @@ export default class Wallet {
 
 			element.classList.add("card")
 			element.addEventListener("click", function(e) {
-				document.querySelector(".selected")?.classList.remove("active");
+				document.querySelector(".selected")?.classList.remove("selected");
 				e.currentTarget.classList.toggle("selected");
 			});
 

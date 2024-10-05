@@ -16,7 +16,6 @@ exports.handler = async (event) => {
 
 	var {user, password} = JSON.parse(event.body);
 	var data = await getStore(user).get("user.json", {type:"json"});
-	console.log(data);
 
 	// check login attempt
 	if (event.httpMethod == "POST") {
@@ -33,7 +32,6 @@ exports.handler = async (event) => {
 			var secret = crypto.randomBytes(32).toString("hex");
 			var time = new Date().toISOString();
 			data.devices.push({ id:new_device, secret:secret, timestamp:time });
-			console.log(data)
 
 			var response = await getStore(user).setJSON("user.json", data);
 			return  {

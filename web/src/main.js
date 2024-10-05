@@ -31,6 +31,11 @@ for (var i = 0; i < footer_buttons.length; i++) {
 	});
 }
 
+// recalc on resize
+visualViewport.addEventListener("resize", () => {
+	footer_spacer.style.width = document.querySelector(".active").getBoundingClientRect().x - 33 + "px";
+});
+
 // reload footer animation
 footer_spacer.nextElementSibling.addEventListener("animationend", function() {
 	footer_spacer.nextElementSibling.style.removeProperty("--footer-animation");
