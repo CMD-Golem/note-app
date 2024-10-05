@@ -1,24 +1,10 @@
-const wallet_data = [
-	{name:"Migros", image:"migros_cumulus", barcode:"ean13", path:"own"},
-	{name:"COOP", image:"coop_supercard", barcode:"ean13", path:"own"},
-	{name:"Migros", image:"migros_cumulus", barcode:"ean13", path:"fam"},
-	{name:"COOP", image:"coop_supercard", barcode:"ean13", path:"fam"},
-	{name:"C&A", image:"ca", barcode:"itf", path:"fam"},
-	{name:"H&M", image:"hm", barcode:"unknown", path:"fam"},
-	{name:"Ochnser Sport", image:"ochsner_sport", barcode:"code128", path:"fam"},
-	{name:"MediaMarkt", image:"mediamarkt", barcode:false, path:"fam"},
-	{name:"Manor", image:"manor", barcode:"mobileqrcode", path:"own"},
-	{name:"Lehner Versand", image:"lehner_versand", barcode:"code128", path:"fam"},
-	{name:"TCS", image:"tcs", barcode:"ean13", path:"own"}
-]
-
 export default class Wallet {
 	static async load() {
 		var main = document.querySelector("main");
 
 		// TODO: Create an array of paths and load them all at once.
 
-		// load images
+		// load data
 		var user_data = JSON.parse(localStorage.getItem("user"));
 		if (user_data == null) return Error("No Account loged in");
 
@@ -31,25 +17,46 @@ export default class Wallet {
 				device_id: user_data.id,
 				request_data: {
 					iv: user_data.iv,
-					path: `wallet/${card.image}_${card.barcode}.svg`,
+					encrypted: true,
+					paths: ["wallet/data.json.enc"]
+				}
+			})
+		});
+
+		var result = await response.json();
+		var decoder = new TextDecoder("utf-8");
+    	var json = decoder.decode(new Uint8Array(result.arrays[i]));
+		var wallet_data = JSON.parse(json);
+
+		// get bar codes
+		var path_array = [];
+		for (var i = 0; i < wallet_data.length; i++) path_array.push(`wallet/${wallet_data[i].image}_${wallet_data[i].barcode}.svg.enc`);
+
+		var response = await fetch("/.netlify/functions/encryption", {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				user: user_data.user,
+				secret: user_data.secret,
+				device_id: user_data.id,
+				request_data: {
+					iv: user_data.iv,
+					paths: path_array,
 					encrypted: true
 				}
 			})
 		});
 
-			
+		// create html
+		var result = await response.json();	
 
 		for (var i = 0; i < wallet_data.length; i++) {
 			var card = wallet_data[i];
 
-			// load images
-			
-
-			var result = await response.json();
-			var data_array = new Uint8Array(result.array);
+			var data_array = new Uint8Array(result.arrays[i]);
 			var binary_string = String.fromCharCode.apply(null, data_array);
 
-			// create html
+			
 			var element = document.createElement('div');
 			if (card.path == "fam") var subtitle = "Familie";
 			else var subtitle = "";

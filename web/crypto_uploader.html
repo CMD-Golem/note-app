@@ -29,9 +29,13 @@ async function uploadBlob(path, encrypted) {
 				device_id: user_data.id,
 				request_data: {
 					iv: user_data.iv,
-					path: path,
 					encrypted: encrypted,
-					array: Array.from(new Uint8Array(e.target.result))
+					paths: [
+						path
+					],
+					arrays: [
+						Array.from(new Uint8Array(e.target.result))
+					]
 				}
 			})
 		});
@@ -55,8 +59,10 @@ async function getBlob(path, encrypted) {
 			device_id: user_data.id,
 			request_data: {
 				iv: user_data.iv,
-				path: path,
-				encrypted: encrypted
+				encrypted: encrypted,
+				paths: [
+					path
+				]
 			}
 		})
 	});
@@ -64,7 +70,7 @@ async function getBlob(path, encrypted) {
 	var result = await response.json();
 	console.log(response);
 	console.log(result);
-	var data_array = new Uint8Array(result.array);
+	var data_array = new Uint8Array(result.arrays[0]);
 	var binary_string = String.fromCharCode.apply(null, data_array);
 
 	document.querySelector("img").src = "data:image/svg+xml;base64," + btoa(binary_string);
@@ -82,7 +88,9 @@ async function deleteBlob(path) {
 			secret: user_data.secret,
 			device_id: user_data.id,
 			request_data: {
-				path: path
+				paths: [
+					path
+				]
 			}
 		})
 	});

@@ -1,18 +1,6 @@
 import { connectLambda, getStore } from "@netlify/blobs";
 import crypto from "crypto";
 
-async function handleCrypto(user_key, iv) {
-	// get encryption_key
-	var encryption_key = await crypto.webcrypto.subtle.importKey("jwk", user_key, {name: 'AES-GCM'}, true, ['encrypt', 'decrypt']);
-
-	// get iv from string
-	var encoder = new TextEncoder();
-	var hash_buffer = await crypto.subtle.digest("SHA-256", encoder.encode(iv));
-	var iv_key = new Uint8Array(hash_buffer).slice(0, 12);
-
-	return [encryption_key, iv_key];
-}
-
 exports.handler = async (event) => {
 	connectLambda(event);
 
@@ -40,6 +28,16 @@ exports.handler = async (event) => {
 			body: "Stored authentication mismatched, new login now required"
 		}
 	}
+
+	if (request_data.encrypted) {
+		// get encryption_key
+		var encryption_key = await crypto.webcrypto.subtle.importKey("jwk", user_data.encryption_key, {name: 'AES-GCM'}, true, ['encrypt', 'decrypt']);
+
+		// get iv from string
+		var encoder = new TextEncoder();
+		var hash_buffer = await crypto.subtle.digest("SHA-256", encoder.encode(request_data.iv));
+		var iv_key = new Uint8Array(hash_buffer).slice(0, 12);
+	}
 	// create new secret if it is time
 	// else if (user_data.timestamp) {
 	// 	var new_secret = crypto.randomBytes(32).toString("hex");
@@ -53,32 +51,35 @@ exports.handler = async (event) => {
 
 	// decrypt and get data
 	if (event.httpMethod == "POST") {
-		var buffer = await getStore(user).get(request_data.path, {type:"arrayBuffer"});
-		if (request_data.encrypted) {
-			var [encryption_key, iv_key] = await handleCrypto(user_data.encryption_key, request_data.iv);
-			var decrypted_buffer = await crypto.webcrypto.subtle.decrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
-		}
-		else var decrypted_buffer = buffer;
+		response_data.arrays = [];
+		for (var i = 0; i < request_data.paths.length; i++) {
+			var buffer = await getStore(user).get(request_data.paths[i], {type:"arrayBuffer"});
+			if (request_data.encrypted) var decrypted_buffer = await crypto.webcrypto.subtle.decrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
+			else var decrypted_buffer = buffer;
 
-		var data_array = Array.from(new Uint8Array(decrypted_buffer));
-		response_data.array = data_array;
+			var data_array = Array.from(new Uint8Array(decrypted_buffer));
+			response_data.arrays.push(data_array);
+		}
 	}
 	// encrypt and upload data
 	else if (event.httpMethod == "PUT") {
-		var buffer = new Uint8Array(request_data.array).buffer;
-		if (request_data.encrypted) {
-			var [encryption_key, iv_key] = await handleCrypto(user_data.encryption_key, request_data.iv);
-			var encrypted_buffer = await crypto.webcrypto.subtle.encrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
-		}
-		else var encrypted_buffer = buffer;
+		response_data.responses = [];
+		for (var i = 0; i < request_data.arrays.length; i++) {
+			var buffer = new Uint8Array(request_data.arrays[i]).buffer;
+			if (request_data.encrypted) var encrypted_buffer = await crypto.webcrypto.subtle.encrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
+			else var encrypted_buffer = buffer;
 
-		var response = await getStore(user).set(request_data.path, encrypted_buffer);
-		response_data.response = response;
+			var response = await getStore(user).set(request_data.paths[i], encrypted_buffer);
+			response_data.responses.push(response);
+		}
 	}
 	// delete data
 	else if (event.httpMethod == "DELETE") {
-		var response = await getStore(user).delete(request_data.path);
-		response_data.response = response;
+		response_data.responses = [];
+		for (var i = 0; i < request_data.paths.length; i++) {
+			var response = await getStore(user).delete(request_data.paths[i]);
+			response_data.responses.push(response);
+		}
 	}
 	// unknown http methode
 	else {
