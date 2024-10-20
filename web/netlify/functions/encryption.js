@@ -22,6 +22,9 @@ exports.handler = async (event) => {
 			body: "This user doesn't exitsts"
 		}
 
+		console.log(typeof user_data)
+		console.log(user_data)
+
 		var index = user_data.devices.findIndex(obj => obj.id == device_id && obj.secret == secret);
 		// return error when device id doesnt match secret
 		if (index == -1) {

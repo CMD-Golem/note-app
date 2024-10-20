@@ -72,8 +72,10 @@ export default class Wallet {
 
 			element.classList.add("card")
 			element.addEventListener("click", function(e) {
+				var same_card = e.currentTarget.classList.contains("selected");
+
 				document.querySelector(".selected")?.classList.remove("selected");
-				e.currentTarget.classList.toggle("selected");
+				if (!same_card) e.currentTarget.classList.toggle("selected");
 			});
 
 			main.appendChild(element);

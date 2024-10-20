@@ -4,8 +4,24 @@
 	font-weight: normal;
 }
 
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background-color: black;
+		--foreground-color: #212022;
+		--text-color: #FFFEFF;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--background-color: black;
+		--foreground-color: #212022;
+		--text-color: #FFFEFF;
+	}
+}
+
 body {
-	background-color: black;
+	background-color: var(--background-color);
 	margin: 0;
 	font-family: roboto;
 }
@@ -31,7 +47,7 @@ footer button {
 	height: 95px;
 	background-color: transparent;
 	border: none;
-	color: #FFFEFF;
+	color: var(--text-color);
 	padding: 0;
 	padding-top: 20px;
 }
@@ -39,7 +55,7 @@ footer button {
 footer button svg {
 	width: 26px;
 	height: 26px;
-	fill: #FFFEFF;
+	fill: var(--text-color);
 }
 
 footer button p {
@@ -50,7 +66,7 @@ footer button p {
 }
 
 footer button.active svg {
-	fill: #212022;
+	fill: var(--foreground-color);
 }
 
 footer button.active p,  footer button:hover p {
@@ -68,7 +84,7 @@ footer .background, footer .buttons {
 footer .background div {
 	display: block;
 	flex-grow: 0;
-	background-color: #212022;
+	background-color: var(--foreground-color);
 }
 
 footer .background svg {
