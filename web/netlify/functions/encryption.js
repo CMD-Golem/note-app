@@ -8,6 +8,8 @@ exports.handler = async (event) => {
 	var {user, secret, device_id, request_data} = JSON.parse(event.body);
 	var response_data = {};
 
+	console.log(user, secret, device_id);
+
 	if (user == "files") {
 		// request_data.iv = null; // gets sent along and is in qrcode
 		user_data.encryption_key = null; // defined somewhere for anyone
@@ -22,7 +24,6 @@ exports.handler = async (event) => {
 			body: "This user doesn't exitsts"
 		}
 
-		console.log(typeof user_data)
 		console.log(user_data)
 
 		var index = user_data.devices.findIndex(obj => obj.id == device_id && obj.secret == secret);
