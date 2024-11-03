@@ -8,8 +8,6 @@ exports.handler = async (event) => {
 	var {user, secret, device_id, request_data} = JSON.parse(event.body);
 	var response_data = {};
 
-	console.log(user, secret, device_id);
-
 	if (user == "files") {
 		// request_data.iv = null; // gets sent along and is in qrcode
 		user_data.encryption_key = null; // defined somewhere for anyone
@@ -18,19 +16,28 @@ exports.handler = async (event) => {
 	}
 	else {
 		// get user data
-		var user_data = await getStore(user).get("user.json", {type:"json"});
+		var user_data = await getStore(user).get("user.json", {type:"json", consistency:"strong"});
 		if (user_data == null) return {
 			statusCode: 404,
 			body: "This user doesn't exitsts"
-		}
-
-		console.log(user_data)
+		};
 
 		var index = user_data.devices.findIndex(obj => obj.id == device_id && obj.secret == secret);
 		// return error when device id doesnt match secret
 		if (index == -1) {
 			user_data.devices = [];
 			var response = await getStore(user).setJSON("user.json", user_data);
+
+			var devices = [];
+			for (var i = 0; i < user_data.devices.length; i++) {
+				devices.push({
+					id: user_data.devices[i].id.slice(0,10),
+					secret: user_data.devices[i].secret.slice(0,10)
+				});
+			}
+
+			console.log(devices);
+			console.log(device_id.slice(0,10), secret.slice(0,10));
 
 			return {
 				statusCode: 406,
@@ -62,7 +69,7 @@ exports.handler = async (event) => {
 	if (event.httpMethod == "POST") {
 		response_data.arrays = [];
 		for (var i = 0; i < request_data.paths.length; i++) {
-			var buffer = await getStore(user).get(request_data.paths[i], {type:"arrayBuffer"});
+			var buffer = await getStore(user).get(request_data.paths[i], {type:"arrayBuffer", consistency:"strong"});
 			if (request_data.encrypted) var decrypted_buffer = await crypto.webcrypto.subtle.decrypt( {name: "AES-GCM", iv: iv_key}, encryption_key, buffer );
 			else var decrypted_buffer = buffer;
 

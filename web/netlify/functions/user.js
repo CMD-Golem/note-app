@@ -15,7 +15,7 @@ exports.handler = async (event) => {
 	connectLambda(event);
 
 	var {user, password} = JSON.parse(event.body);
-	var data = await getStore(user).get("user.json", {type:"json"});
+	var data = await getStore(user).get("user.json", {type:"json", consistency:"strong"});
 
 	// check login attempt
 	if (event.httpMethod == "POST") {
