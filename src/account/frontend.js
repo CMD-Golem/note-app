@@ -1,25 +1,54 @@
 export default class Account {
-	static load() {
+	static async load() {
 		var main = document.querySelector("main");
-		var element = document.createElement("div");
-		var register_button = document.createElement("button");
-		var login_button = document.createElement("button");
+		// button.addEventListener("click", app.buttonClick.bind(null, true));
 
-		register_button.addEventListener("click", app.buttonClick.bind(null, true));
-		login_button.addEventListener("click", app.buttonClick.bind(null, false));
-		register_button.innerHTML = "Create Data";
-		login_button.innerHTML = "Login";
+		// check if logged in
+		// var user_data = JSON.parse(localStorage.getItem("user"));
+		// if (user_data == null) {
+			
+		// }
+		// else {
+		// 	var response = await fetch("/.netlify/functions/encryption", {
+		// 		method: "POST",
+		// 		headers: {"Content-Type": "application/json"},
+		// 		body: JSON.stringify({
+		// 			user: user_data.user,
+		// 			secret: user_data.secret,
+		// 			device_id: user_data.id,
+		// 			request_data: {
+		// 				iv: user_data.iv,
+		// 				encrypted: true,
+		// 				paths: ["account.json.enc"]
+		// 			}
+		// 		})
+		// 	});
+	
+		// 	var result = await response.json();
+		// 	var decoder = new TextDecoder("utf-8");
+		// 	var json = decoder.decode(new Uint8Array(result.arrays[0]));
+		// 	var account_data = JSON.parse(json);
+		// }
 
-		element.innerHTML = `
-			<input placeholder="User Name" id="login_user" autocomplete="username">
-			<input placeholder="Password" id="login_password" type="password" autocomplete="current-password">
-			<input placeholder="Identifier" id="login_identifier" type="password" autocomplete="one-time-code">
+
+		main.innerHTML = `
+			<div class="selection">
+				<button id="login" onclick="app.changeButtons('login')">Login</button>
+				<button id="register" onclick="app.changeButtons('register')">Register</button>
+				<button id="generate" onclick="app.changeButtons('generate')">Generate</button>
+			</div>
+
+
+			<input placeholder="User Name" id="login_user" autocomplete="username" class="login register">
+			<input placeholder="Page" id="login_page" autocomplete="one-time-code" class="generate">
+			<input placeholder="Password" id="login_password" type="password" autocomplete="current-password" class="login register generate">
+			<input placeholder="Confirm Password" id="login_confirm" type="password" autocomplete="one-time-code" class="register">
+			<input placeholder="Identifier" id="login_identifier" type="password" autocomplete="one-time-code" class="generate">
+			<button id="main_button" onlick="app.buttonClick()"></button>
 			<div id="login_info"></div>
 		`;
-
-		element.appendChild(register_button);
-		element.appendChild(login_button);
-		main.appendChild(element);
+		
+		Public.changeButtons("generate");
 
 		console.log("loaded Account");
 	}
@@ -86,8 +115,19 @@ export default class Account {
 }
 
 export class Public {
-	static async buttonClick(register) {
+	static active_type;
+	static type_dictionary = {login:"Login", register:"Register", generate:"Generate"};
+
+	static async buttonClick() {
 		// check if device already
-		Account.login(register);
+		if (active_type == "login") Account.login(false);
+		else if (active_type == "register") Account.login(true);
+		
+	}
+
+	static changeButtons(type) {
+		this.active_type = type;
+		document.getElementById("main_button").innerHTML = this.type_dictionary[type];
+		document.querySelector("main").setAttribute("data-type", type);
 	}
 }

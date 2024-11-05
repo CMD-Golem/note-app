@@ -1,8 +1,10 @@
 main {
 	padding: 40px;
+	max-width: 600px;
+	margin: 0 auto;
 }
 
-input, .selection {
+input, .selection, #main_button {
 	border: none;
 	outline: none;
 	color: var(--text-color);
@@ -28,13 +30,32 @@ input, .selection {
 	border-radius: 35px;
 }
 
-.selection button.selected {
-	background-color: var(--text-color);
-	color: var(--foreground-color);
-}
-
 input {
 	width: calc(100% - 17.5px);
 	padding-left: 17.5px;
 	margin-bottom: 10px;
+}
+
+#main_button {
+	display: block;
+	width: 100px;
+	margin: 20px auto;
+}
+
+
+main[data-type="login"] #login,
+main[data-type="register"] #register,
+main[data-type="generate"] #generate {
+	background-color: var(--text-color);
+	color: var(--foreground-color);
+}
+
+.login, .register, .generate {
+	display: none;
+}
+
+main[data-type="login"] .login,
+main[data-type="register"] .register,
+main[data-type="generate"] .generate {
+	display: block;
 }
