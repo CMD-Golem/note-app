@@ -30,6 +30,11 @@ input, .selection, #main_button {
 	border-radius: 35px;
 }
 
+.selection button:hover {
+	/* border: 2px solid var(--text-color); */
+	text-decoration: underline;
+}
+
 input {
 	width: calc(100% - 17.5px);
 	padding-left: 17.5px;
@@ -38,24 +43,45 @@ input {
 
 #main_button {
 	display: block;
-	width: 100px;
+	width: 150px;
 	margin: 20px auto;
+}
+
+#login_info {
+	display: block;
+	margin-top: 50px;
+	text-align: center;
+	user-select: all;
+}
+
+#main_button:hover {
+	border: 2px solid var(--text-color);
+}
+
+main[data-loggedin="true"] #login,
+main[data-loggedin="true"] #register,
+main[data-loggedin="false"] #reset_pw,
+main[data-loggedin="false"] #logout {
+	display: none;
 }
 
 
 main[data-type="login"] #login,
 main[data-type="register"] #register,
-main[data-type="generate"] #generate {
+main[data-type="generate"] #generate,
+main[data-type="reset_pw"] #reset_pw,
+main[data-type="logout"] #logout {
 	background-color: var(--text-color);
 	color: var(--foreground-color);
 }
 
-.login, .register, .generate {
+.login, .register, .generate, .reset_pw {
 	display: none;
 }
 
 main[data-type="login"] .login,
 main[data-type="register"] .register,
-main[data-type="generate"] .generate {
+main[data-type="generate"] .generate,
+main[data-type="reset_pw"] .reset_pw {
 	display: block;
 }
