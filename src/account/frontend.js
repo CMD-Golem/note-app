@@ -72,14 +72,14 @@ export default class Account {
 
 		var response = await fetch("/.netlify/functions/user", {
 			method: "POST",
-			headers: JSON.stringify({
+			headers: {
 				"Content-Type": "application/json",
 				Authorization: {
 					user: user,
 					password: password
 				},
 				Action: action
-			}),
+			},
 			body: JSON.stringify(data)
 		});
 

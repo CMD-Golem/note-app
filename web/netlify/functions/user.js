@@ -14,7 +14,9 @@ import crypto from "crypto";
 exports.handler = async (event) => {
 	connectLambda(event);
 
-	var {Authorization, Action} = JSON.parse(event.header);
+	console.log(event.header)
+
+	var {Authorization, Action} = event.header;
 	var data = await getStore(Authorization.user).get("user.json", {type:"json", consistency:"strong"});
 
 	if (Action == "login") {
